@@ -5,75 +5,198 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>P5LIVE Snippets</title>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js" referrerpolicy="no-referrer"></script>	<script src="//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
 	<style type="text/css">
+		*{
+			box-sizing: border-box;
+			outline:none !important;
+		}
 		body{
+			background:#222;
+			color:#fff;
 			font-family:monospace;
 		}
 		#title{
-			font-size:24pt;
+			font-size:1.4em;
 		}
 		#nav{
 			margin:15px 0 15px 0;
 			
 		}
-		#select-snippet{
-			font-size:1.4em;
+		#select-snippet, #button-download{
+			font-size:1em;
+			padding:5px;
+			border-radius:5px;
+			background:#444;
+			border:1px solid #666;
+			color:#fff;
+			margin-left:10px;
 		}
-		.code-textarea{
-			height:15vh;
-			width:50vw;
+		#button-download{
+		}
+		.code-section{
+			height:calc(100vh / 5 - 45px);
+			width:95vw;
+			margin-bottom:30px;
+		}
+		.code-label{
+			position: relative;
+			background:#666;
+			border:1px solid #666;
+			border-bottom:none;
+			width:200px;
+			background: #011F2F;
+			margin-bottom:-1px;
+			padding:5px;
+			z-index:2;
+			color:#666;
+		}
+		.code-editor{
+			height:100%;
+			background:#002222;
+			border:1px solid #666;
+			font-size:10pt;
+			background: #011F2F;
+			color: #00ff00;
 		}
 	</style>
 </head>
 <body>
-	<div id="title">P5LIVE Snippets</div>
 	<div id="nav">
-		<select id="select-snippet"></select>
+		<span id="title">P5LIVE </span>
+		<select id="select-snippet" onchange="getSnippet(this.value)">
+			<option value="snippet">Snippets</option>
+		</select>
+		<button id="button-download" onclick="downloadSnippet()">Export</button>
+		<span></span>
 	</div>
 
 	<div id="code">
-		<textarea id="code-gt" class="code-textarea"></textarea>
-		<textarea id="code-s" class="code-textarea"></textarea>
-		<textarea id="code-dt" class="code-textarea"></textarea>
-		<textarea id="code-db" class="code-textarea"></textarea>
-		<textarea id="code-gb" class="code-textarea"></textarea>
+		<div class="code-section">
+			<div class="code-label">// GLOBAL TOP</div>
+			<div id="code-gt" class="code-editor">let helloWorld = true</div>
+		</div>
+		<div class="code-section">
+			<div class="code-label">// SETUP</div>
+			<div id="code-s" class="code-editor">let helloWorld = true</div>
+		</div>
+		<div class="code-section">
+			<div class="code-label">// DRAW TOP</div>
+			<div id="code-dt" class="code-editor">let helloWorld = true</div>
+		</div>
+		<div class="code-section">
+			<div class="code-label">// DRAW BOTTOM</div>
+			<div id="code-db" class="code-editor">let helloWorld = true</div>
+		</div>
+		<div class="code-section">
+			<div class="code-label">// GLOBAL BOTTOM</div>
+			<div id="code-gb" class="code-editor">let helloWorld = true</div>
+		</div>
 	</div>
 
 <script type="text/javascript">
+	let getData = true
 	let url = 'https://api.github.com/repos/ffd8/p5live_snippets/contents/snippets'
-	let snippets = []
+	let snippets = {
+		snippet:{ name:'snippet', code:{ gt:'', s:'', dt:'', db:'', gb:''}, }
+	}
+	let snippetsSize = 0, snippetsSel = -1
 
 	let elms = {
 		select: document.getElementById('select-snippet'),
-		gt:document.getElementById('code-gt'),
-		s:document.getElementById('code-s'),
-		dt:document.getElementById('code-dt'),
-		db:document.getElementById('code-db'),
-		gb:document.getElementById('code-gb'),
+		code:{
+			gt:document.getElementById('code-gt'),
+			s:document.getElementById('code-s'),
+			dt:document.getElementById('code-dt'),
+			db:document.getElementById('code-db'),
+			gb:document.getElementById('code-gb'),
+		},
 	}
 
+	let editors = {}
+
 	const xhr = new XMLHttpRequest();
-    // const url = "https://api.github.com/repos/gitblanc/Obsidian-Notes/contents/"
-    // Replace -username- with your GitHub username, -repo- with the repository name, and then :path with a path to the file or folder you want to get the content of (leave blank to ge all files of the repository)
 
     xhr.open('GET', url, true);
 
     xhr.onload = function() {
         const data = JSON.parse(this.response);
         // console.log(data);
+        snippetsSize = data.length
         for(let d of data){
-        	// console.log(d)
         	(async() => {
 			const res = await axios.get(d.download_url)
 			let snippet = res.data
-        	elms.select.innerHTML += `<option value="${snippets.length}">${snippet.name}</option>`
-			snippets.push(snippet)
-			console.log(res.data)
+			// console.log(snippet)
+			
+			elms.select.innerHTML += `<option>${snippet.name}</option>`
+			snippets[snippet.name] = snippet
+			snippetsSize--
+			
+			// done loading
+			if(snippetsSize == 0){
+
+			}
 			})()
         }
     };
     
-    xhr.send();
+    
+
+    function getSnippet(snippet){
+    	console.log(snippets[snippet])
+    	snippetsSel = snippet
+    	editors.gt.setValue(snippets[snippet].code.gt, 1)
+    	editors.s.setValue(snippets[snippet].code.s, 1)
+    	editors.dt.setValue(snippets[snippet].code.dt, 1)
+    	editors.db.setValue(snippets[snippet].code.db, 1)
+    	editors.gb.setValue(snippets[snippet].code.gb, 1)
+    }
+
+    function downloadSnippet(){
+    	exportJSON(snippets[snippetsSel], `P5L_SNIPPET_${snippets[snippetsSel].name}.json`)
+    }
+
+    function exportJSON(jsonData, jsonFilename){
+		const filename = jsonFilename;
+		const jsonStr = JSON.stringify(jsonData, undefined, 2);
+
+		let element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonStr));
+		element.setAttribute('download', filename);
+		element.style.display = 'none';
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
+	}
+
+
+    // SNIPPET CODE EDITORS
+    let editorOptions = {
+		showPrintMargin: false,
+		animatedScroll: true,
+		displayIndentGuides: false,
+		useWorker: true,
+		showLineNumbers: false,
+		showGutter: false,
+		scrollPastEnd:1,
+		tabSize: 4, useSoftTabs: false,
+	}
+
+	function initSnippets(){
+		for (const [key, value] of Object.entries(elms.code)) {
+			editors[key] = ace.edit(elms.code[key]);
+			editors[key].setTheme("ace/theme/gob");
+			editors[key].getSession().setMode("ace/mode/javascript");
+			editors[key].setOptions(editorOptions)
+		}
+
+		getSnippet('snippet')
+
+		if(getData) xhr.send();
+	}
+	initSnippets()
 
 </script>
 </body>
