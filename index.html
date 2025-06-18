@@ -4,11 +4,53 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>P5LIVE Snippets</title>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<style type="text/css">
+		body{
+			font-family:monospace;
+		}
+		#title{
+			font-size:24pt;
+		}
+		#nav{
+			margin:15px 0 15px 0;
+			
+		}
+		#select-snippet{
+			font-size:1.4em;
+		}
+		.code-textarea{
+			height:15vh;
+			width:50vw;
+		}
+	</style>
 </head>
 <body>
+	<div id="title">P5LIVE Snippets</div>
+	<div id="nav">
+		<select id="select-snippet"></select>
+	</div>
+
+	<div id="code">
+		<textarea id="code-gt" class="code-textarea"></textarea>
+		<textarea id="code-s" class="code-textarea"></textarea>
+		<textarea id="code-dt" class="code-textarea"></textarea>
+		<textarea id="code-db" class="code-textarea"></textarea>
+		<textarea id="code-gb" class="code-textarea"></textarea>
+	</div>
 
 <script type="text/javascript">
-	let url = 'https://api.github.com/repos/ffd8/p5live_snippets/contents'
+	let url = 'https://api.github.com/repos/ffd8/p5live_snippets/contents/snippets'
+	let snippets = []
+
+	let elms = {
+		select: document.getElementById('select-snippet'),
+		gt:document.getElementById('code-gt'),
+		s:document.getElementById('code-s'),
+		dt:document.getElementById('code-dt'),
+		db:document.getElementById('code-db'),
+		gb:document.getElementById('code-gb'),
+	}
 
 	const xhr = new XMLHttpRequest();
     // const url = "https://api.github.com/repos/gitblanc/Obsidian-Notes/contents/"
@@ -18,12 +60,21 @@
 
     xhr.onload = function() {
         const data = JSON.parse(this.response);
-
-        console.log(data);
+        // console.log(data);
+        for(let d of data){
+        	// console.log(d)
+        	(async() => {
+			const res = await axios.get(d.download_url)
+			let snippet = res.data
+        	elms.select.innerHTML += `<option value="${snippets.length}">${snippet.name}</option>`
+			snippets.push(snippet)
+			console.log(res.data)
+			})()
+        }
     };
     
     xhr.send();
-	
+
 </script>
 </body>
 </html>

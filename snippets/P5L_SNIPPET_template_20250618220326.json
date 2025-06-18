@@ -1,0 +1,13 @@
+{
+  "version": "1.6.3",
+  "revision": 53,
+  "doctype": "P5L_SNIPPET",
+  "name": "template",
+  "code": {
+    "gt": "// global top",
+    "s": "// setup bottom",
+    "dt": "// draw top",
+    "db": "// draw bottom",
+    "gb": "// global bottom"
+  }
+}
