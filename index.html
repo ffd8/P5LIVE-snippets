@@ -24,7 +24,7 @@
 			margin:15px 0 15px 0;
 			
 		}
-		#select-snippet, #button-download{
+		#select-snippet, .button{
 			font-size:1em;
 			padding:5px;
 			border-radius:5px;
@@ -66,9 +66,10 @@
 	<div id="nav">
 		<span id="title">P5LIVE </span>
 		<select id="select-snippet" onchange="getSnippet(this.value)">
-			<option value="snippet">Snippets</option>
+			<option value="snippet">Snippets Manager</option>
 		</select>
-		<button id="button-download" onclick="downloadSnippet()">Export</button>
+		<button id="button-add" class="button" onclick="addSnippet()">Add</button>
+		<button id="button-download" class="button" onclick="downloadSnippet()">Export</button>
 		<span></span>
 	</div>
 
@@ -156,13 +157,17 @@
     
 
     function getSnippet(snippet){
-    	console.log(snippets[snippet])
+    	// console.log(snippets[snippet])
     	snippetsSel = snippet
     	editors.gt.setValue(snippets[snippet].code.gt, 1)
     	editors.s.setValue(snippets[snippet].code.s, 1)
     	editors.dt.setValue(snippets[snippet].code.dt, 1)
     	editors.db.setValue(snippets[snippet].code.db, 1)
     	editors.gb.setValue(snippets[snippet].code.gb, 1)
+    }
+
+    function addSnippet(){
+    	parent.postMessage(snippets[snippetsSel], "*");  //  `*` on any domain     
     }
 
     function downloadSnippet(){
