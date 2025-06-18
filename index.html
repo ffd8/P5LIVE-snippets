@@ -134,6 +134,8 @@
         // console.log(data);
         snippetsSize = data.length
         for(let d of data){
+
+        	// https://stackoverflow.com/a/71484399/10885535
         	(async() => {
 			const res = await axios.get(d.download_url)
 			let snippet = res.data

@@ -1,0 +1,13 @@
+{
+  "version": "1.6.3",
+  "revision": 53,
+  "doctype": "P5L_SNIPPET",
+  "name": "webcam",
+  "code": {
+    "gt": "let capture, scl = 1",
+    "s": "capture = createCapture(VIDEO)\n// capture.size(320, 240) // small\ncapture.hide() // hide raw camera\nimageMode(CENTER)",
+    "dt": "",
+    "db": "image(capture, mouseX, mouseY, capture.width * scl, capture.height * scl)",
+    "gb": ""
+  }
+}
