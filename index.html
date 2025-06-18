@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>P5LIVE Snippets</title>
+</head>
+<body>
+
+<script type="text/javascript">
+	let url = 'https://api.github.com/repos/ffd8/p5live_snippets/contents'
+
+	const xhr = new XMLHttpRequest();
+    // const url = "https://api.github.com/repos/gitblanc/Obsidian-Notes/contents/"
+    // Replace -username- with your GitHub username, -repo- with the repository name, and then :path with a path to the file or folder you want to get the content of (leave blank to ge all files of the repository)
+
+    xhr.open('GET', url, true);
+
+    xhr.onload = function() {
+        const data = JSON.parse(this.response);
+
+        console.log(data);
+    };
+    
+    xhr.send();
+	
+</script>
+</body>
+</html>
