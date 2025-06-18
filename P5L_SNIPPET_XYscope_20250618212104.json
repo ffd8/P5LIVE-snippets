@@ -1,0 +1,13 @@
+{
+  "version": "1.6.3",
+  "revision": 53,
+  "doctype": "P5L_SNIPPET",
+  "name": "XYscope",
+  "code": {
+    "gt": "let libs = ['https://teddavis.org/xyscopejs/xyscope.js', 'data/libs/xyscope.js',]\nlet xy;",
+    "s": "xy = new XYscope(this)\nxy.canvas()\nxy.textAlign(CENTER, CENTER);\n\nxy2 = new XYscope(this, xy.outXY) // addative synth",
+    "dt": "xy.drawXY()\nxy.limitPath()\n\nxy.freq(50)\nxy.clearWaves()\n// draw stuff here\n\nxy.buildWaves()",
+    "db": "",
+    "gb": "function mousePressed() {\n\txy.resume()\n}"
+  }
+}
