@@ -11,7 +11,7 @@
     "gb": "function mousePressed() {\n\txy.resume()\n}"
   },
   "credits": {
-    "name": "ffd8",
+    "author": "ffd8",
     "about": "vector graphics on vector displays with xyscope.js - more details: https://teddavis.org/xyscopejs"
   },
   "date": "20250624"

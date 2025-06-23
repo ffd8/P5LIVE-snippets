@@ -9,47 +9,47 @@
 	<script src="includes/js/popper.min.js"></script>
 	<script src="includes/js/tippy.all.js"></script>
 	<script src="includes/js/dropzone.js"></script>
-	<script src="includes/js/vex/js/vex.combined.min.js"></script>
-	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js" referrerpolicy="no-referrer"></script>	<script src="//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="includes/js/axios.min.js"></script>
+	<script src="//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
-	<link rel="stylesheet" href="includes/js/vex/css/vex.css" />
-	<link rel="stylesheet" href="includes/js/vex/css/vex-theme-plain.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="style.css?56">
 
 	<style type="text/css">
-	*{
-		box-sizing: border-box;
-	}
-	#snippets-credits{
-		position:absolute;
-		width:100%;
-		border:1px solid #888;
-		border-top:none;
-		margin-top:-10px;
-		z-index:9;
-		background:#444;
-		display:flex;
-		padding:8px 5px 8px 5px;
-		font-size:10pt;
-		box-sizing:border-box;
-		display:none;
-	}
-	#snippets-credits input{
-		border:none;
-		border-bottom:1px solid #aaa;
-		background:none;
-		background:#555;
-		color:#fff;
-		outline:none;
-		padding:2px 5px 2px 5px;
-	}
-	#snippets-credits-name{
-		width:150px;
-	}
-	#snippets-credits-about{
-		flex-grow: 1
-	}
+		body{
+			background:none;
+		}
+		*{
+			box-sizing: border-box;
+		}
+		#snippets-credits{
+			position:absolute;
+			width:100%;
+			border:1px solid #888;
+			border-top:none;
+			margin-top:-10px;
+			z-index:9;
+			background:#444;
+			display:flex;
+			padding:8px 5px 8px 5px;
+			font-size:10pt;
+			box-sizing:border-box;
+			display:none;
+		}
+		#snippets-credits input{
+			border:none;
+			border-bottom:1px solid #aaa;
+			background:none;
+			background:#555;
+			color:#fff;
+			outline:none;
+			padding:2px 5px 2px 5px;
+		}
+		#snippets-credits-name{
+			width:150px;
+		}
+		#snippets-credits-about{
+			flex-grow: 1
+		}
 	</style>
 </head>
 <body>
@@ -83,8 +83,9 @@
 			</div>
 
 			<div id="snippets-credits">
-				BY: <input id="snippets-credits-name" class="snippets-credits-input" type="text" name="" placeholder="name" value="hello"> 
-				INFO: <input id="snippets-credits-about" class="snippets-credits-input" type="text" name="" placeholder="about" value="world">
+				NAME: <input id="snippets-credits-name" class="snippets-credits-input" type="text" name="" placeholder="name" value="blah"> 
+				BY: <input id="snippets-credits-author" class="snippets-credits-input" type="text" name="" placeholder="author" value="hello"> 
+				INFO: <input id="snippets-credits-about" class="snippets-credits-input" type="text" name="" placeholder="about snippet" value="world">
 			</div>
 			
 			<div class="snippets-section">
@@ -137,7 +138,7 @@
 	let getData = true
 	let url = 'https://api.github.com/repos/ffd8/p5live_snippets/contents/snippets'
 	let snippets = {
-		info:{ name:'info', code:{ gt:'// welcome to the P5LIVE SNIPPETS MANAGER! \n// a repo of community-contributed snippets for P5LIVE.', s:'// use the dropdown to select available snippets.\n// Apply, to test snippet (CMD Z to undo)\n// Export, to save one offline\n// Import, to copy snippet into your User snippets list', dt:'// have a great snippet to contribute?\n// visit » https://github.com/ffd8/p5live-snippets\n// make a pull request with snippet to add to this repo', db:'', gb:''}, }
+		info:{ name:'info', code:{ gt:'// welcome to the P5LIVE SNIPPETS MANAGER! \n// a repo of community-contributed snippets for P5LIVE.', s:'// use the dropdown to select available snippets.\n// About, get/set credits\n// Apply, to test snippet (CMD Z to undo)\n// Export, to download snippet\n// Import, to copy snippet into your User snippets list', dt:'// have a great snippet to contribute?\n// visit » https://github.com/ffd8/p5live-snippets', db:'', gb:''}, credits:{author:'ffd8', about:'hello world'},}
 	}
 	let snippetsSize = 0, snippetsCur = null
 
@@ -153,6 +154,7 @@
 		credits: {
 			holder: document.getElementById('snippets-credits'),
 			name: document.getElementById('snippets-credits-name'),
+			author: document.getElementById('snippets-credits-author'),
 			about: document.getElementById('snippets-credits-about'),
 		},
 	}
@@ -209,10 +211,17 @@
     	editors.db.setValue(snippet.code.db, 1)
     	editors.gb.setValue(snippet.code.gb, 1)
 
+    	elms.credits.name.value = snippet.name
+
     	if(snippet.hasOwnProperty('credits')){
-    		elms.credits.name.value = snippet.credits.name
+    		elms.credits.author.value = snippet.credits.author
     		elms.credits.about.value = snippet.credits.about
+    	}else{
+    		getStorage(elms.credits.author, 'p5l-snippets-credits-author')
+			elms.credits.about.value = ''
     	}
+
+    	lockCredits()
     }
 
     function snippetsToggle(){
@@ -231,7 +240,7 @@
     	let tempSnippet = JSON.parse(JSON.stringify(snippetsCur))
     	tempSnippet.doctype = 'P5L_SNIPPET'
     	tempSnippet.credits = {
-    		name: elms.credits.name.value,
+    		author: elms.credits.author.value,
     		about: elms.credits.about.value,
     	}
     	tempSnippet.date = timeStamp(false)
@@ -249,6 +258,18 @@
 		document.body.appendChild(element);
 		element.click();
 		document.body.removeChild(element);
+	}
+
+	function lockCredits(lock = true){
+		if(lock){
+			elms.credits.name.disabled = true
+			elms.credits.author.disabled = true
+			elms.credits.about.disabled = true
+		}else{
+			elms.credits.name.disabled = false
+			elms.credits.author.disabled = false
+			elms.credits.about.disabled = false
+		}
 	}
 
 	function toggleCredits(hide){
@@ -286,15 +307,28 @@
 		if(getData) xhr.send();
 
 
-		elms.credits.name.addEventListener('input', (e)=>{
-			localStorage.setItem('p5l-snippets-credits-name', elms.credits.name.value)
-		})
+		// inputListener(elms.credits.name, 'p5l-snippets-credits-name')
+		inputListener(elms.credits.author, 'p5l-snippets-credits-author')
+		inputListener(elms.credits.about, 'p5l-snippets-credits-about')
 
-		elms.credits.about.addEventListener('input', (e)=>{
-			localStorage.setItem('p5l-snippets-credits-about', elms.credits.about.value)
-		})
 	}
 	initSnippets()
+
+	function inputListener(elm, item){
+		elm.addEventListener('input', (e)=>{
+			setStorage(item, elm.value)
+		})
+	}
+
+	function setStorage(item, value){
+		localStorage.setItem(item, value)
+	}
+
+	function getStorage(elm, item){
+		if(localStorage.hasOwnProperty(item)){
+			elm.value = localStorage.getItem(item)
+		}
+	}
 
 
 	// P5LIVE UTILS
@@ -424,6 +458,7 @@
 						// console.log(tSnippet)
 						if(tSnippet.hasOwnProperty('doctype') && tSnippet.doctype == 'P5L_SNIPPET'){
 							getSnippet(tSnippet)
+							lockCredits(false)
 						}else{
 							alert('oops, error loading snippet')
 							// vex.dialog.alert({
