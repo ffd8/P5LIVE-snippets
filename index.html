@@ -33,7 +33,7 @@
 		padding:8px 5px 8px 5px;
 		font-size:10pt;
 		box-sizing:border-box;
-		//display:none;
+		display:none;
 	}
 	#snippets-credits input{
 		border:none;
@@ -83,8 +83,8 @@
 			</div>
 
 			<div id="snippets-credits">
-				BY: <input id="snippets-credits-name" type="text" name="" placeholder="name" value="hello"> 
-				INFO: <input id="snippets-credits-about" type="text" name="" placeholder="about" value="world">
+				BY: <input id="snippets-credits-name" class="snippets-credits-input" type="text" name="" placeholder="name" value="hello"> 
+				INFO: <input id="snippets-credits-about" class="snippets-credits-input" type="text" name="" placeholder="about" value="world">
 			</div>
 			
 			<div class="snippets-section">
@@ -129,7 +129,7 @@
 	/*
 		TODO
 			- √redesign to match P5LIVE Snippet Editor panel (w/ color tweak)
-			- x? import snippet (button, drag+drop)
+			- √ import snippet (drag+drop)
 			- x contribute snippet (init PR with json file?)
 			- √√! iframe embed within P5LIVE with option to 'ADD'
 	*/
@@ -189,7 +189,14 @@
     
     window.document.addEventListener("mouseup", function (e) {
     	// console.log(e.target.getAttribute('class'))
-    	if(!['ace_content', 'snippets-select menu-button tippy', 'tippy'].includes(e.target.getAttribute('class'))){  
+    	let ignoreElms = [
+	    		'ace_content', 
+	    		'snippets-select menu-button tippy', 
+	    		'tippy', 
+	    		'snippets-credits-input',
+    		]
+    	if(!ignoreElms.includes(e.target.getAttribute('class'))){  
+	 		e.target.blur()
 	 		parent.postMessage({msg:'blur'}, "*");  //  `*` on any domain
 	 	} 
 	});
@@ -222,7 +229,6 @@
 
     function downloadSnippet(){
     	let tempSnippet = JSON.parse(JSON.stringify(snippetsCur))
-    	// tempSnippet.code = getCode()
     	tempSnippet.doctype = 'P5L_SNIPPET'
     	tempSnippet.credits = {
     		name: elms.credits.name.value,
