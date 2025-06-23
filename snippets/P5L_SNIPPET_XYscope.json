@@ -5,9 +5,14 @@
   "name": "XYscope",
   "code": {
     "gt": "let libs = ['https://teddavis.org/xyscopejs/xyscope.js', 'data/libs/xyscope.js',]\nlet xy;",
-    "s": "xy = new XYscope(this)\nxy.canvas()\nxy.textAlign(CENTER, CENTER);\n\nxy2 = new XYscope(this, xy.outXY) // addative synth",
+    "s": "xy = new XYscope(this)\nxy.canvas()\nxy.textAlign(CENTER, CENTER);\n\nxy2 = new XYscope(this, xy.outXY) // additive synth",
     "dt": "xy.drawXY()\nxy.limitPath()\n\nxy.freq(50)\nxy.clearWaves()\n// draw stuff here\n\nxy.buildWaves()",
     "db": "",
     "gb": "function mousePressed() {\n\txy.resume()\n}"
-  }
+  },
+  "credits": {
+    "name": "ffd8",
+    "about": "vector graphics on vector displays with xyscope.js - more details: https://teddavis.org/xyscopejs"
+  },
+  "date": "20250624"
 }
