@@ -214,6 +214,7 @@
     	elms.credits.name.value = snippet.name
 
     	if(snippet.hasOwnProperty('credits')){
+    		console.log(snippet.credits)
     		elms.credits.author.value = snippet.credits.author
     		elms.credits.about.value = snippet.credits.about
     	}else{
@@ -244,7 +245,7 @@
     		about: elms.credits.about.value,
     	}
     	tempSnippet.date = timeStamp(false)
-    	exportJSON(tempSnippet, `P5L_SNIPPET_${tempSnippet.name}.json`)
+    	exportJSON(tempSnippet, `P5L_SNIPPET_${tempSnippet.name}_${timeStamp()}.json`)
     }
 
     function exportJSON(jsonData, jsonFilename){
