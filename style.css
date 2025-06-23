@@ -343,7 +343,7 @@ overflow-y: hidden;
 }
 .menu-section{
 	position:relative;
-	margin:0 0 10px 0;
+	margin:0 0 8px 0;
 	border:1px solid #888;
 }
 .menu-section hr{
@@ -1538,7 +1538,7 @@ li{
 }
 
 /* DRAG + DROP */
-#p5-drop{
+#drop{
 	position:fixed;
 	width:100vw;
 	height:100vh;

@@ -3,26 +3,57 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>P5LIVE Snippets</title>
+	<title>P5LIVE SNIPPETS MANAGER</title>
 	
 	<script src="includes/js/beautify.min.js"></script>
 	<script src="includes/js/popper.min.js"></script>
 	<script src="includes/js/tippy.all.js"></script>
+	<script src="includes/js/dropzone.js"></script>
 	<script src="includes/js/vex/js/vex.combined.min.js"></script>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js" referrerpolicy="no-referrer"></script>	<script src="//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
 	<link rel="stylesheet" href="includes/js/vex/css/vex.css" />
 	<link rel="stylesheet" href="includes/js/vex/css/vex-theme-plain.css" />
-	<link rel="stylesheet" type="text/css" media="all" href="style.css?53">
+	<link rel="stylesheet" type="text/css" media="all" href="style.css?56">
 
 	<style type="text/css">
 	*{
 		box-sizing: border-box;
 	}
+	#snippets-credits{
+		position:absolute;
+		width:100%;
+		border:1px solid #888;
+		border-top:none;
+		margin-top:-10px;
+		z-index:9;
+		background:#444;
+		display:flex;
+		padding:8px 5px 8px 5px;
+		font-size:10pt;
+		box-sizing:border-box;
+		//display:none;
+	}
+	#snippets-credits input{
+		border:none;
+		border-bottom:1px solid #aaa;
+		background:none;
+		background:#555;
+		color:#fff;
+		outline:none;
+		padding:2px 5px 2px 5px;
+	}
+	#snippets-credits-name{
+		width:150px;
+	}
+	#snippets-credits-about{
+		flex-grow: 1
+	}
 	</style>
 </head>
 <body>
+	<div id="drop"></div>
 	<div id="snippets-panel">
 		<div class="snippets-bg"></div>
 		<div id="snippets-content">
@@ -35,105 +66,70 @@
 					</div>
 				</div>
 				<div class="menu-sketches-buttons">
-					<select id="select-snippet" class="snippets-select menu-button tippy" onchange="getSnippet(this.value)" data-title="Select Snippet">
-						<option value="snippet">Info</option>
+					<select id="select-snippet" class="snippets-select menu-button tippy" onchange="getSnippet(snippets[this.value])" data-title="Select Snippet">
+						<option value="info">Info</option>
 					</select>
 					
+					<button class="menu-button snippets-btn-all tippy" onclick="toggleCredits()" data-title="About Snippet"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg></button>
+
 					<button class="menu-button snippets-btn-all tippy" onclick="applySnippet()" data-title="Apply Snippet"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></button>
 
-					<!-- <button class="menu-button snippets-btn-all tippy" onclick="snippetsImportDialog()" data-title="Import Snippet"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></button>
-					<input id="file-input-snippet" type="file" name="name" style="display: none;" multiple onchange="snippetsImport(this.files);" onclick="this.value=null;" /> -->
-					
 					<button class="menu-button snippets-btn-all tippy" onclick="downloadSnippet()" data-title="Export Snippet"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></button>
-					<input id="file-input-snippet" type="file" name="name" style="display: none;" multiple onchange="snippetsImport(this.files);" onclick="this.value=null;" />
+					<!-- <input id="file-input-snippet" type="file" name="name" style="display: none;" multiple onchange="snippetsImport(this.files);" onclick="this.value=null;" /> -->
 
 					<button class="menu-button snippets-btn-all tippy" onclick="addSnippet()" data-title="Import Snippet"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
-
-
 
 				</div>
 			</div>
 
-			<!-- <div id="snippets-nav">
-				
-			</div> -->
+			<div id="snippets-credits">
+				BY: <input id="snippets-credits-name" type="text" name="" placeholder="name" value="hello"> 
+				INFO: <input id="snippets-credits-about" type="text" name="" placeholder="about" value="world">
+			</div>
 			
 			<div class="snippets-section">
 				<div class="snippets-label">
 					<span>// global top </span>
-					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(snip.editors['gt'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(editors['gt'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
 				</div>
 				<pre id="snippets-code-gt"></pre>
 			</div>
 			<div class="snippets-section">
 				<div class="snippets-label">
 					<span>// setup bottom</span>
-					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(snip.editors['s'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(editors['s'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
 				</div>
 				<pre id="snippets-code-s"></pre>
 			</div>
 			<div class="snippets-section">
 				<div class="snippets-label">
 					<span>// draw top</span>
-					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(snip.editors['dt'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(editors['dt'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
 				</div>
 				<pre id="snippets-code-dt"></pre>
 			</div>
 			<div class="snippets-section">
 				<div class="snippets-label">
 					<span>// draw bottom</span>
-					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(snip.editors['db'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(editors['db'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
 				</div>
 				<pre id="snippets-code-db"></pre><br>
 			</div>
 			<div class="snippets-section">
 				<div class="snippets-label">
 					<span>// global bottom</span>
-					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(snip.editors['gb'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+					<svg class="tippy" data-title="Tidy Code" onclick="tidyCode(editors['gb'])" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
 				</div>
 				<pre id="snippets-code-gb"></pre>
 			</div>
 		</div>
 	</div>
 
-	<!-- <div id="nav">
-		<span id="title">P5LIVE </span>
-		<select id="select-snippet" onchange="getSnippet(this.value)">
-			<option value="snippet">Snippets Manager</option>
-		</select>
-		<button id="button-add" class="button" onclick="addSnippet()">Add</button>
-		<button id="button-download" class="button" onclick="downloadSnippet()">Export</button>
-		<span></span>
-	</div>
-
-	<div id="code">
-		<div class="code-section">
-			<div class="code-label">// GLOBAL TOP</div>
-			<div id="code-gt" class="code-editor">let helloWorld = true</div>
-		</div>
-		<div class="code-section">
-			<div class="code-label">// SETUP</div>
-			<div id="code-s" class="code-editor">let helloWorld = true</div>
-		</div>
-		<div class="code-section">
-			<div class="code-label">// DRAW TOP</div>
-			<div id="code-dt" class="code-editor">let helloWorld = true</div>
-		</div>
-		<div class="code-section">
-			<div class="code-label">// DRAW BOTTOM</div>
-			<div id="code-db" class="code-editor">let helloWorld = true</div>
-		</div>
-		<div class="code-section">
-			<div class="code-label">// GLOBAL BOTTOM</div>
-			<div id="code-gb" class="code-editor">let helloWorld = true</div>
-		</div>
-	</div> -->
-
 <script type="text/javascript">
 	/*
 		TODO
-			- redesign to match P5LIVE Snippet Editor panel (w/ color tweak)
-			- import snippet (button, drag+drop)
+			- √redesign to match P5LIVE Snippet Editor panel (w/ color tweak)
+			- x? import snippet (button, drag+drop)
 			- x contribute snippet (init PR with json file?)
 			- √√! iframe embed within P5LIVE with option to 'ADD'
 	*/
@@ -141,9 +137,9 @@
 	let getData = true
 	let url = 'https://api.github.com/repos/ffd8/p5live_snippets/contents/snippets'
 	let snippets = {
-		snippet:{ name:'snippet', code:{ gt:'welcome to the SNIPPETS MANAGER, \na contributors repo of P5LIVE snippets \nto easily import into your own settings.', s:'', dt:'', db:'', gb:''}, }
+		info:{ name:'info', code:{ gt:'// welcome to the P5LIVE SNIPPETS MANAGER! \n// a repo of community-contributed snippets for P5LIVE.', s:'// use the dropdown to select available snippets.\n// Apply, to test snippet (CMD Z to undo)\n// Export, to save one offline\n// Import, to copy snippet into your User snippets list', dt:'// have a great snippet to contribute?\n// visit » https://github.com/ffd8/p5live-snippets\n// make a pull request with snippet to add to this repo', db:'', gb:''}, }
 	}
-	let snippetsSize = 0, snippetsSel = -1
+	let snippetsSize = 0, snippetsCur = null
 
 	let elms = {
 		select: document.getElementById('select-snippet'),
@@ -153,6 +149,11 @@
 			dt:document.getElementById('snippets-code-dt'),
 			db:document.getElementById('snippets-code-db'),
 			gb:document.getElementById('snippets-code-gb'),
+		},
+		credits: {
+			holder: document.getElementById('snippets-credits'),
+			name: document.getElementById('snippets-credits-name'),
+			about: document.getElementById('snippets-credits-about'),
 		},
 	}
 
@@ -186,16 +187,25 @@
         }
     };
     
-    
+    window.document.addEventListener("mouseup", function (e) {
+    	// console.log(e.target.getAttribute('class'))
+    	if(!['ace_content', 'snippets-select menu-button tippy', 'tippy'].includes(e.target.getAttribute('class'))){  
+	 		parent.postMessage({msg:'blur'}, "*");  //  `*` on any domain
+	 	} 
+	});
 
     function getSnippet(snippet){
-    	// console.log(snippets[snippet])
-    	snippetsSel = snippet
-    	editors.gt.setValue(snippets[snippet].code.gt, 1)
-    	editors.s.setValue(snippets[snippet].code.s, 1)
-    	editors.dt.setValue(snippets[snippet].code.dt, 1)
-    	editors.db.setValue(snippets[snippet].code.db, 1)
-    	editors.gb.setValue(snippets[snippet].code.gb, 1)
+    	snippetsCur = snippet
+    	editors.gt.setValue(snippet.code.gt, 1)
+    	editors.s.setValue(snippet.code.s, 1)
+    	editors.dt.setValue(snippet.code.dt, 1)
+    	editors.db.setValue(snippet.code.db, 1)
+    	editors.gb.setValue(snippet.code.gb, 1)
+
+    	if(snippet.hasOwnProperty('credits')){
+    		elms.credits.name.value = snippet.credits.name
+    		elms.credits.about.value = snippet.credits.about
+    	}
     }
 
     function snippetsToggle(){
@@ -203,15 +213,23 @@
     }
 
     function applySnippet(){
-    	parent.postMessage({msg:'apply', snippet: snippets[snippetsSel]}, "*");  //  `*` on any domain 
+    	parent.postMessage({msg:'apply', snippet: snippetsCur}, "*");  //  `*` on any domain 
     }
 
     function addSnippet(){
-    	parent.postMessage({msg:'add', snippet: snippets[snippetsSel]}, "*");  //  `*` on any domain     
+    	parent.postMessage({msg:'add', snippet: snippetsCur}, "*");  //  `*` on any domain     
     }
 
     function downloadSnippet(){
-    	exportJSON(snippets[snippetsSel], `P5L_SNIPPET_${snippets[snippetsSel].name}.json`)
+    	let tempSnippet = JSON.parse(JSON.stringify(snippetsCur))
+    	// tempSnippet.code = getCode()
+    	tempSnippet.doctype = 'P5L_SNIPPET'
+    	tempSnippet.credits = {
+    		name: elms.credits.name.value,
+    		about: elms.credits.about.value,
+    	}
+    	tempSnippet.date = timeStamp(false)
+    	exportJSON(tempSnippet, `P5L_SNIPPET_${tempSnippet.name}.json`)
     }
 
     function exportJSON(jsonData, jsonFilename){
@@ -225,6 +243,14 @@
 		document.body.appendChild(element);
 		element.click();
 		document.body.removeChild(element);
+	}
+
+	function toggleCredits(hide){
+		if(elms.credits.holder.style.display == 'flex' || hide){
+			elms.credits.holder.style.display = 'none'
+		}else{
+			elms.credits.holder.style.display = 'flex'
+		}
 	}
 
 
@@ -246,11 +272,21 @@
 			editors[key].setTheme("ace/theme/gob");
 			editors[key].getSession().setMode("ace/mode/javascript");
 			editors[key].setOptions(editorOptions)
+			editors[key].on('change', ()=>{snippetsCur.code[key] = editors[key].getValue()});
 		}
 
-		getSnippet('snippet')
+		getSnippet(snippets['info'])
 
 		if(getData) xhr.send();
+
+
+		elms.credits.name.addEventListener('input', (e)=>{
+			localStorage.setItem('p5l-snippets-credits-name', elms.credits.name.value)
+		})
+
+		elms.credits.about.addEventListener('input', (e)=>{
+			localStorage.setItem('p5l-snippets-credits-about', elms.credits.about.value)
+		})
 	}
 	initSnippets()
 
@@ -302,7 +338,106 @@
 			});
 		}
 
-		
+
+		// beautify!
+		let beautifyOptions = {
+			'indent_size': '1',
+			'indent_char': '\t',
+			'max_preserve_newlines': '5',
+			'preserve_newlines': true,
+			'keep_array_indentation': false,
+			'break_chained_methods': false,
+			'indent_scripts': 'normal',
+			'brace_style': 'none,preserve-inline',
+			'space_before_conditional': false,
+			'unescape_strings': false,
+			'jslint_happy': false,
+			'end_with_newline': false,
+			'wrap_line_length': '0',
+			'indent_inner_html': false,
+			'comma_first': false,
+			'e4x': false
+		}
+
+		function tidyCode(aceEdit){
+			let tempPos = aceEdit.getCursorPosition();
+			let tempCode = js_beautify(aceEdit.getValue(), beautifyOptions);
+			aceEdit.setValue(tempCode, 1);
+			aceEdit.gotoLine(tempPos.row+1, tempPos.column, false);
+			aceEdit.focus()
+		}
+
+
+		// DRAG + DROP
+		let divDrop = document.getElementById('drop');
+		let myDropzone = new Dropzone(document.body, {
+			autoProcessQueue: false,
+			url: '/data', // unused but needed for URL expectation
+			acceptedFiles:'.json',
+			clickable:false,
+			init: function() {
+				this.on('addedfile', function(file, responseText) {
+					snippetsImport(myDropzone.files)
+					divDrop.style.display = 'none';
+					myDropzone.files = []; // clear list
+				});
+				this.on('dragenter', function(file, responseText) {
+					// console.log(event.dataTransfer.dropEffect)
+					if(event.dataTransfer.dropEffect != 'move' && !document.hasFocus()){
+						divDrop.style.display = 'block';
+					}
+				});
+				this.on('dragleave', function(file, responseText) {
+					divDrop.style.display = 'none';
+				});
+				this.on('drop', function(file, responseText) {
+					divDrop.style.display = 'none';
+				});
+				this.on('dragover', function(file, responseText) {
+					// console.log(event.dataTransfer.dropEffect);
+					if(event.dataTransfer.dropEffect != 'move' && !document.hasFocus()){
+						divDrop.style.display = 'block';
+					}
+				});
+				this.on('error', function(file, responseText) {
+					console.log('error importing')
+					myDropzone.files = []; // clear list
+				});
+			},
+		});
+
+		function snippetsImport(data){
+			// console.log(data)
+			for(let i=0; i < data.length; i++){
+				let reader = new FileReader()
+				reader.onload = function(data) {
+					let tSnippet
+					
+					try{
+						tSnippet = JSON.parse(data.target.result);
+						// console.log(tSnippet)
+						if(tSnippet.hasOwnProperty('doctype') && tSnippet.doctype == 'P5L_SNIPPET'){
+							getSnippet(tSnippet)
+						}else{
+							alert('oops, error loading snippet')
+							// vex.dialog.alert({
+							// 	message:'Oops, select a P5L_SNIPPET file.'
+							// })
+						}
+					}catch(e){
+						console.log(e)
+					}
+					
+				}
+				reader.readAsText(data[i])
+			}
+		}
+
+		function timeStamp(time = true){
+			let d = new Date();
+			d.setTime( d.getTime() - new Date().getTimezoneOffset()*60*1000 );
+			return d.toISOString().replace(/[^0-9]/g, '').slice(0, time ? -3 : -9);
+		}
 
 </script>
 </body>
