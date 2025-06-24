@@ -1,0 +1,18 @@
+{
+  "version": "1.6.3",
+  "revision": 53,
+  "doctype": "P5L_SNIPPET",
+  "name": "HY5_p5_hydra",
+  "code": {
+    "gt": "let libs = [\n\t'https://unpkg.com/hydra-synth', 'includes/libs/hydra-synth.js',\n\t'https://cdn.jsdelivr.net/gh/ffd8/hy5@main/hy5.js', 'includes/libs/hy5.js'\n]\n\n// sandbox - start\nH.pixelDensity(1) // 2 = retina, set <= 1 if laggy\n\n// P5.toggle(0) // optionally hide p5\n\nsrc(s0)\n\t// .modulate(noize())\n\t.out()\n// sandbox - end",
+    "s": "s0.initP5() // send p5 to hydra",
+    "dt": "",
+    "db": "",
+    "gb": ""
+  },
+  "credits": {
+    "author": "ffd8",
+    "about": "HY5 example to pass p5.js contents into hydra-synth"
+  },
+  "date": "20250624"
+}

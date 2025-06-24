@@ -1,0 +1,18 @@
+{
+  "version": "1.6.3",
+  "revision": 53,
+  "doctype": "P5L_SNIPPET",
+  "name": "HY5_hydra_p5",
+  "code": {
+    "gt": "let libs = [\n\t'https://unpkg.com/hydra-synth', 'includes/libs/hydra-synth.js',\n\t'https://cdn.jsdelivr.net/gh/ffd8/hy5@main/hy5.js', 'includes/libs/hy5.js'\n]\n\n// sandbox - start\n// H.pixelDensity(2) // 2 = retina, set <= 1 if laggy\nH.toggle(0) // hide hydra\nP5.z(1) // set z-index of p5 above hydra\n\nosc()\n\t.out()\n// sandbox - end",
+    "s": "// createCanvas(windowWidth, windowHeight, WEBGL) // for 3D texture/shapes\ns0.initP5() // bring p5 into hydra",
+    "dt": "H.get() // creates 'h0'\nimage(h0, 0, 0)\n\n// texture(h0) // enable WEBGL in setup\n// sphere(height/3) // enable WEBGL in setup\n",
+    "db": "",
+    "gb": ""
+  },
+  "credits": {
+    "author": "ffd8",
+    "about": "HY5 example to pass hydra-synth into p5"
+  },
+  "date": "20250624"
+}

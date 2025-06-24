@@ -12,7 +12,7 @@
 	<script src="includes/js/axios.min.js"></script>
 	<script src="//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
-	<link rel="stylesheet" type="text/css" media="all" href="style.css?56">
+	<link rel="stylesheet" type="text/css" media="all" href="style.css?60">
 
 	<style type="text/css">
 		body{
@@ -35,20 +35,36 @@
 			box-sizing:border-box;
 			display:none;
 		}
+		.snippets-credits-section{
+			margin-right:10px;
+		}
+		.snippets-credits-section:last-child{
+			flex-grow: 1
+		}
+		.snippets-credits-label{
+/*			border-bottom:2px solid #aaa;*/
+			float:left;
+			padding-right:5px;
+			color:#ddd;
+/*			width:50px;*/
+		}
 		#snippets-credits input{
 			border:none;
-			border-bottom:1px solid #aaa;
+/*			border-bottom:1px solid #aaa;*/
+			border-radius: 5px;
 			background:none;
-			background:#555;
+			background:#333;
 			color:#fff;
 			outline:none;
-			padding:2px 5px 2px 5px;
+			padding:4px;
+			margin-top:-2px;
+/*			width:100%;*/
 		}
-		#snippets-credits-name{
-			width:150px;
+		#snippets-credits-name, #snippets-credits-author{
+			max-width:100px;
 		}
 		#snippets-credits-about{
-			flex-grow: 1
+			width:85%;
 		}
 	</style>
 </head>
@@ -83,9 +99,18 @@
 			</div>
 
 			<div id="snippets-credits">
-				NAME: <input id="snippets-credits-name" class="snippets-credits-input" type="text" name="" placeholder="name" value="blah"> 
-				BY: <input id="snippets-credits-author" class="snippets-credits-input" type="text" name="" placeholder="author" value="hello"> 
-				INFO: <input id="snippets-credits-about" class="snippets-credits-input" type="text" name="" placeholder="about snippet" value="world">
+				<div class="snippets-credits-section">
+					<div class="snippets-credits-label">NAME</div>
+					<input id="snippets-credits-name" class="snippets-credits-input" type="text" name="" placeholder="name" value="blah">
+				</div>
+				<div class="snippets-credits-section">
+					<div class="snippets-credits-label">BY</div>
+					<input id="snippets-credits-author" class="snippets-credits-input" type="text" name="" placeholder="author" value="hello">
+				</div>
+				<div class="snippets-credits-section">
+					<div class="snippets-credits-label">INFO</div>
+					<input id="snippets-credits-about" class="snippets-credits-input" type="text" name="" placeholder="about snippet" value="world">
+				</div>
 			</div>
 			
 			<div class="snippets-section">
@@ -133,6 +158,7 @@
 			- √ import snippet (drag+drop)
 			- x contribute snippet (init PR with json file?)
 			- √√! iframe embed within P5LIVE with option to 'ADD'
+			- √trim unused CSS
 	*/
 
 	let getData = true
@@ -243,6 +269,7 @@
     		author: elms.credits.author.value,
     		about: elms.credits.about.value,
     	}
+    	tempSnippet.name = elms.credits.name.value.replace(/["']/g, '');
     	tempSnippet.date = timeStamp(false)
     	exportJSON(tempSnippet, `P5L_SNIPPET_${tempSnippet.name}_${timeStamp()}.json`)
     }
@@ -307,7 +334,7 @@
 		if(getData) xhr.send();
 
 
-		// inputListener(elms.credits.name, 'p5l-snippets-credits-name')
+		inputListener(elms.credits.name, 'p5l-snippets-credits-name')
 		inputListener(elms.credits.author, 'p5l-snippets-credits-author')
 		inputListener(elms.credits.about, 'p5l-snippets-credits-about')
 
